@@ -4,7 +4,7 @@
 	ViewData["Title"] = "Tasks";
 }
 <div class="d-flex gap-2 align-items-center mb-3">
-	<a asp-action="Create" class="btn btn-primary">Add new task</a>
+	<a asp-action="Create" class="btn btn-primary">Add a new task</a>
 </div>
 <h1 class="text-danger">Pending tasks</h1>
 @foreach (var item in Model)
@@ -12,25 +12,29 @@
 	if (!item.IsCompleted)
 	{
 		<div class="border rounded p-3 mb-3">
-			<h2>@Html.DisplayFor(modelItem => item.Title)</h2>
+			<h2>@item.Title</h2>
 			<div class="d-flex gap-1">
-				@if (item.DueDate < DateTime.Now)
+				@if (item.DueDate == null)
 				{
-					<span class="border rounded-pill p-1 mb-1 d-inline-block text-danger">Due @Html.DisplayFor(modelItem => item.DueDate)</span>
+					<span class="border rounded-pill p-1 mb-1 d-inline-block">No Due Date</span>
+				}
+				else if (item.DueDate < DateTime.Now)
+				{
+					<span class="border rounded-pill p-1 mb-1 d-inline-block text-danger">Due @item.DueDate</span>
 				}
 				else
 				{
-					<span class="border rounded-pill p-1 mb-1 d-inline-block">Due @Html.DisplayFor(modelItem => item.DueDate)</span>
+					<span class="border rounded-pill p-1 mb-1 d-inline-block">Due @item.DueDate</span>
 				}
 
                 @foreach (var category in item.Categories)
 				{
-                    <span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@Html.DisplayFor(modelItem => category.Name)</span>
+                    <span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@category.Name</span>
 				}
             </div>
-				<section class="h5">@Html.DisplayFor(modelItem => item.Description)</section>
-				<section class="fst-italic fw-light text-secondary mb-1">Created @Html.DisplayFor(modelItem => item.CreationDate)</section>
-				<a asp-action="Complete" class="btn btn-success">Mark as completed</a>
+				<section class="h5">@item.Description</section>
+				<section class="fst-italic fw-light text-secondary mb-1">Created @item.CreationDate</section>
+				<a asp-action="Complete" asp-route-id="@item.Id" class="btn btn-success">Mark as completed</a>
 		</div>
 	}
 }
@@ -41,17 +45,17 @@
 	if (item.IsCompleted)
 	{
 		<div class="border rounded p-3 mb-3">
-			<h2>@Html.DisplayFor(modelItem => item.Title)</h2>
+			<h2>@item.Title</h2>
             <div class="d-flex gap-1">
                 @foreach (var category in item.Categories)
                 {
-                    <span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@Html.DisplayFor(modelItem => category.Name)</span>
+                    <span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@category.Name</span>
                 }
             </div>
 			<div class="mb-3">
-				<section class="h5">@Html.DisplayFor(modelItem => item.Description)</section>
-				<section class="fst-italic fw-light text-secondary mb-1">Created @Html.DisplayFor(modelItem => item.CreationDate)</section>
-				<a asp-action="Delete" class="btn btn-danger">Delete</a>
+				<section class="h5">@item.Description</section>
+				<section class="fst-italic fw-light text-secondary mb-1">Created @item.CreationDate</section>
+				<a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
 			</div>
 		</div>
 	}
