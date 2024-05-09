@@ -2,7 +2,7 @@
 
 namespace ToDoApp.Models
 {
-    public class Task
+    public class TaskToDo
     {
         public int Id { get; set; }
         public string? Title { get; set; }

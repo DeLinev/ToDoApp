@@ -2,7 +2,6 @@ using ToDoApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IDapperContext, DapperContext>();
-//builder.Services.Add
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -26,6 +25,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=tasks}/{action=Index}/{id?}");
+    pattern: "{controller=Tasks}/{action=Index}/{id?}");
 
 app.Run();

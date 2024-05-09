@@ -1,13 +1,45 @@
-﻿@model IEnumerable<ToDoApp.Models.Task>
+﻿@using ToDoApp.ViewModels
+@model MainPageViewModel
 
 @{
 	ViewData["Title"] = "Tasks";
 }
-<div class="d-flex gap-2 align-items-center mb-3">
-	<a asp-action="Create" class="btn btn-primary">Add a new task</a>
-</div>
-<h1 class="text-danger">Pending tasks</h1>
-@foreach (var item in Model)
+<style>
+	.chck-style {
+		background-color: white;
+	}
+</style>
+
+<h1>New Task: </h1>
+<form asp-action="Create">
+	<div class="d-flex gap-2 align-items-end mb-2">
+		<div class="form-group">
+			<label asp-for="NewTask.Title" class="control-label"></label>
+			<input asp-for="NewTask.Title" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label asp-for="NewTask.Description" class="control-label"></label>
+			<input asp-for="NewTask.Description" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label asp-for="NewTask.DueDate" class="control-label"></label>
+			<input asp-for="NewTask.DueDate" class="form-control" />
+		</div>
+		<div class="form-group">
+			<input type="submit" value="Create" class="btn btn-primary" />
+		</div>
+	</div>
+	<div class="form-group">
+		@foreach (var category in Model.Categories)
+		{
+			<input type="checkbox" class="btn-check" id="@category.Id" name="Categories" value="@category.Id">
+			<label class="btn btn-warning rounded-pill chck-style" for="@category.Id">@category.Name</label>
+		}
+	</div>
+</form>
+
+<h1 class="text-danger mt-2">Pending tasks</h1>
+@foreach (var item in Model.Tasks)
 {
 	if (!item.IsCompleted)
 	{
@@ -27,31 +59,31 @@
 					<span class="border rounded-pill p-1 mb-1 d-inline-block">Due @item.DueDate</span>
 				}
 
-                @foreach (var category in item.Categories)
+				@foreach (var category in item.Categories)
 				{
-                    <span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@category.Name</span>
+					<span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@category.Name</span>
 				}
-            </div>
-				<section class="h5">@item.Description</section>
-				<section class="fst-italic fw-light text-secondary mb-1">Created @item.CreationDate</section>
-				<a asp-action="Complete" asp-route-id="@item.Id" class="btn btn-success">Mark as completed</a>
+			</div>
+			<section class="h5">@item.Description</section>
+			<section class="fst-italic fw-light text-secondary mb-1">Created @item.CreationDate</section>
+			<a asp-action="Complete" asp-route-id="@item.Id" class="btn btn-success">Mark as completed</a>
 		</div>
 	}
 }
 
 <h1 class="text-success">Comleted tasks</h1>
-@foreach (var item in Model)
+@foreach (var item in Model.Tasks)
 {
 	if (item.IsCompleted)
 	{
 		<div class="border rounded p-3 mb-3">
 			<h2>@item.Title</h2>
-            <div class="d-flex gap-1">
-                @foreach (var category in item.Categories)
-                {
-                    <span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@category.Name</span>
-                }
-            </div>
+			<div class="d-flex gap-1">
+				@foreach (var category in item.Categories)
+				{
+					<span class="border border-warning bg-opacity-25 bg-warning rounded-pill p-1 mb-1 d-inline-block">@category.Name</span>
+				}
+			</div>
 			<div class="mb-3">
 				<section class="h5">@item.Description</section>
 				<section class="fst-italic fw-light text-secondary mb-1">Created @item.CreationDate</section>
