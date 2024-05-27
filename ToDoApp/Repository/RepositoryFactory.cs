@@ -1,10 +1,12 @@
-﻿using ToDoApp.Data;
+﻿using Microsoft.Extensions.Configuration;
+using ToDoApp.Data;
 
 namespace ToDoApp.Repository
 {
 	public static class RepositoryFactory
 	{
 		public static IDapperContext DapperContext { get; set; }
+		public static IConfiguration XmlConfiguration { get; set; }
 
 		public static IRepository CreateRepository(string type)
 		{
@@ -17,7 +19,13 @@ namespace ToDoApp.Repository
 			}
 			else if (type == "XML")
 			{
-				return new XmlRepository();
+				if (XmlConfiguration == null)
+					throw new ArgumentNullException("Configuration is not set");
+
+				string tasksPath = XmlConfiguration.GetConnectionString("TasksPath");
+				string categoriesPath = XmlConfiguration.GetConnectionString("CategoriesPath");
+
+				return new XmlRepository(tasksPath, categoriesPath);
 			}
 			else
 			{

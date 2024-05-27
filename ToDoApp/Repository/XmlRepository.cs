@@ -1,20 +1,30 @@
 ﻿using ToDoApp.Models;
 using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace ToDoApp.Repository
 {
 	public class XmlRepository : IRepository
 	{
+		private readonly string _tasksPath;
+		private readonly string _categoriesPath;
+
+		public XmlRepository(string taskspath, string categoriesPath)
+		{
+			_tasksPath = taskspath;
+			_categoriesPath = categoriesPath;
+		}
+
 		public void Add(TaskToDo entity, int[] categoriesId)
 		{
 			entity.CreationDate = DateTime.Now;
-			XDocument tasksDoc = XDocument.Load("Data/Tasks.xml");
+			XDocument tasksDoc = XDocument.Load(_tasksPath);
 
-			XElement lastTask = tasksDoc.Root.Elements("task").LastOrDefault();
-			int lastTaskId = lastTask != null ? int.Parse(lastTask.Attribute("id").Value) : 0;
+			Guid newGuid = Guid.NewGuid();
+			int newTaskId = newGuid.GetHashCode();
 
 			XElement taskElement = new XElement("task",
-				new XAttribute("id", ++lastTaskId),
+				new XAttribute("id", newTaskId),
 				new XAttribute("isCompleted", entity.IsCompleted),
 				new XElement("title", entity.Title),
 				new XElement("description", entity.Description),
@@ -29,28 +39,28 @@ namespace ToDoApp.Repository
 			);
 
 			tasksDoc.Root.Add(taskElement);
-			tasksDoc.Save("Data/Tasks.xml");
+			tasksDoc.Save(_tasksPath);
 		}
 
 		public void Complete(int entityId)
 		{
-			XDocument tasksDoc = XDocument.Load("Data/Tasks.xml");
+			XDocument tasksDoc = XDocument.Load(_tasksPath);
 			XElement taskElement = tasksDoc.Root.Elements("task").FirstOrDefault(t => t.Attribute("id").Value == entityId.ToString());
 			taskElement.Attribute("isCompleted").Value = "true";
-			tasksDoc.Save("Data/Tasks.xml");
+			tasksDoc.Save(_tasksPath);
 		}
 
 		public void Delete(int entityId)
 		{
-			XDocument tasksDoc = XDocument.Load("Data/Tasks.xml");
+			XDocument tasksDoc = XDocument.Load(_tasksPath);
 			XElement taskElement = tasksDoc.Root.Elements("task").FirstOrDefault(t => t.Attribute("id").Value == entityId.ToString());
 			taskElement.Remove();
-			tasksDoc.Save("Data/Tasks.xml");
+			tasksDoc.Save(_tasksPath);
 		}
 
 		public List<Category> GetAllCategories()
 		{
-			XDocument doc = XDocument.Load("Data/Categories.xml");
+			XDocument doc = XDocument.Load(_categoriesPath);
 			List<Category> categories = new List<Category>();
 
 			foreach (XElement categoryElement in doc.Root.Elements("category"))
@@ -66,7 +76,7 @@ namespace ToDoApp.Repository
 
 		public List<TaskToDo> GetAllTasks()
 		{
-			XDocument doc = XDocument.Load("Data/Tasks.xml");
+			XDocument doc = XDocument.Load(_tasksPath);
 			List<TaskToDo> tasks = new List<TaskToDo>();
 
 			foreach (XElement taskElement in doc.Root.Elements("task"))
@@ -87,7 +97,7 @@ namespace ToDoApp.Repository
 					Category category = new Category();
 					category.Id = int.Parse(categoryElement.Attribute("id").Value);
 					
-					XDocument categoriesDoc = XDocument.Load("Data/Categories.xml");
+					XDocument categoriesDoc = XDocument.Load(_categoriesPath);
 					XElement categoryNameElement = categoriesDoc.Root.Elements("category").FirstOrDefault(c => c.Attribute("id").Value == category.Id.ToString());
 					category.Name = categoryNameElement.Element("name").Value;
 

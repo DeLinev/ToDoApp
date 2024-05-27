@@ -10,10 +10,11 @@ namespace ToDoApp.Controllers
 		private IRepository _repository;
 		private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public TasksController(IDapperContext dapperContext, IHttpContextAccessor httpContextAccessor)
+		public TasksController(IDapperContext dapperContext, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
 		{
 			_httpContextAccessor = httpContextAccessor;
 			RepositoryFactory.DapperContext = dapperContext;
+			RepositoryFactory.XmlConfiguration = configuration;
 			_repository = RepositoryFactory.CreateRepository(_httpContextAccessor.HttpContext.Session.GetString("repositoryType") ?? "Dapper");
 		}
 
