@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tasks>
+  <task id="1" isCompleted="false">
+    <title>Task 24</title>
+    <description>Description of Task 1</description>
+    <creationDate>2024-05-22T19:51:15.8766523+03:00</creationDate>
+    <dueDate>2024-05-29T19:51:15.8975228+03:00</dueDate>
+    <categories>
+      <category id="8"></category>
+      <category id="2"></category>
+    </categories>
+  </task>
+  <task id="2" isCompleted="false">
+    <title>My New XML Task!</title>
+    <description>Descriprion</description>
+    <creationDate>0001-01-01T00:00:00</creationDate>
+    <dueDate>2024-05-28T15:00:00</dueDate>
+    <categories>
+      <category id="2" />
+      <category id="4" />
+      <category id="5" />
+    </categories>
+  </task>
+  <task id="3" isCompleted="false">
+    <title />
+    <description>енкенкенкен</description>
+    <creationDate>2024-05-23T16:41:08.256025+03:00</creationDate>
+    <dueDate />
+    <categories />
+  </task>
+</tasks>

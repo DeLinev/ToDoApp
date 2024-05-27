@@ -6,10 +6,7 @@
         public string Name { get; set; }
         public List<TaskToDo> Tasks { get; set; }
 
-        public Category()
-        {
-
-        }
+        public Category() { }
 
         public Category(int id, string name)
         {

@@ -1,0 +1,26 @@
+﻿<categories>
+	<category id="1">
+		<name>Work</name>
+	</category>
+	<category id="2">
+		<name>Study</name>
+	</category>
+	<category id="3">
+		<name>Shopping</name>
+	</category>
+	<category id="4">
+		<name>Math</name>
+	</category>
+	<category id="5">
+		<name>Programming</name>
+	</category>
+	<category id="6">
+		<name>Important</name>
+	</category>
+	<category id="7">
+		<name>Films</name>
+	</category>
+	<category id="8">
+		<name>Books</name>
+	</category>
+</categories>

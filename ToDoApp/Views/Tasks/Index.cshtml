@@ -1,5 +1,5 @@
 ﻿@using ToDoApp.ViewModels
-@model MainPageViewModel
+ @model MainPageViewModel
 
 @{
 	ViewData["Title"] = "Tasks";
@@ -9,6 +9,22 @@
 		background-color: white;
 	}
 </style>
+
+<form method="post" action="@Url.Action("ChangeRepository", "Tasks")" class="d-flex gap-1">
+	<select name="repositoryType" class="form-select w-25">
+		@if (Model.RepositoryType == "Dapper")
+		{
+			<option value="Dapper" selected>Database</option>
+			<option value="XML">XML</option>
+		}
+		else
+		{
+			<option value="Dapper">Database</option>
+			<option value="XML" selected>XML</option>
+		}
+	</select>
+    <input type="submit" value="Change" class="btn btn-secondary"/>
+</form>
 
 <h1>New Task: </h1>
 <form asp-action="Create">
@@ -32,7 +48,7 @@
 	<div class="form-group">
 		@foreach (var category in Model.Categories)
 		{
-			<input type="checkbox" class="btn-check" id="@category.Id" name="Categories" value="@category.Id">
+			<input type="checkbox" class="btn-check" id="@category.Id" name="categories" value="@category.Id">
 			<label class="btn btn-warning rounded-pill chck-style" for="@category.Id">@category.Name</label>
 		}
 	</div>
