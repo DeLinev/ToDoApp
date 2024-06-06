@@ -1,6 +1,5 @@
 ﻿using ToDoApp.Models;
 using System.Xml.Linq;
-using Microsoft.Extensions.Configuration;
 
 namespace ToDoApp.Repository
 {
@@ -98,7 +97,8 @@ namespace ToDoApp.Repository
 					category.Id = int.Parse(categoryElement.Attribute("id").Value);
 					
 					XDocument categoriesDoc = XDocument.Load(_categoriesPath);
-					XElement categoryNameElement = categoriesDoc.Root.Elements("category").FirstOrDefault(c => c.Attribute("id").Value == category.Id.ToString());
+					XElement categoryNameElement = categoriesDoc.Root.Elements("category")
+						.FirstOrDefault(c => c.Attribute("id").Value == category.Id.ToString());
 					category.Name = categoryNameElement.Element("name").Value;
 
 					categories.Add(category);
@@ -109,6 +109,45 @@ namespace ToDoApp.Repository
 			}
 
 			return tasks;
+		}
+
+		public TaskToDo GetTask(int id)
+		{
+			XDocument doc = XDocument.Load(_tasksPath);
+			XElement taskElement = doc.Root.Elements("task")
+				.FirstOrDefault(t => t.Attribute("id").Value == id.ToString());
+
+			if (taskElement == null)
+				return null;
+
+			TaskToDo task = new TaskToDo();
+
+			task.Id = int.Parse(taskElement.Attribute("id").Value);
+			task.IsCompleted = bool.Parse(taskElement.Attribute("isCompleted").Value);
+			task.Title = taskElement.Element("title").Value;
+			task.Description = taskElement.Element("description").Value;
+			task.CreationDate = DateTime.Parse(taskElement.Element("creationDate").Value);
+
+			bool isSuccess = DateTime.TryParse(taskElement.Element("dueDate").Value, out DateTime dueDate);
+			task.DueDate = isSuccess ? dueDate : null;
+
+			List<Category> categories = new List<Category>();
+			foreach (XElement categoryElement in taskElement.Element("categories").Elements("category"))
+			{
+				Category category = new Category();
+				category.Id = int.Parse(categoryElement.Attribute("id").Value);
+
+				XDocument categoriesDoc = XDocument.Load(_categoriesPath);
+				XElement categoryNameElement = categoriesDoc.Root.Elements("category")
+					.FirstOrDefault(c => c.Attribute("id").Value == category.Id.ToString());
+				category.Name = categoryNameElement.Element("name").Value;
+
+				categories.Add(category);
+			}
+
+			task.Categories = categories;
+
+			return task;
 		}
 	}
 }

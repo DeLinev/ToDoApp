@@ -23,6 +23,9 @@ namespace ToDoApp.Repository
 														 "OUTPUT INSERTED.Id " +
 														 "VALUES (@Title, @Description, @CreationDate, @DueDate, @IsCompleted)", entity);
 
+				if (categoriesId == null)
+					return;
+
 				foreach (var categoryId in categoriesId)
 				{
 					connection.Execute("INSERT INTO TasksCategories (TaskId, CategoryId) VALUES (@TaskId, @CategoryId)", new { TaskId = taskId, CategoryId = categoryId });
@@ -79,6 +82,31 @@ namespace ToDoApp.Repository
 			using (var connection = _dapperContext.CreateConnection())
 			{
 				connection.Execute("UPDATE Tasks SET IsCompleted = 1 WHERE Id = @Id", new { Id = entityId });
+			}
+		}
+
+		public TaskToDo GetTask(int id)
+		{
+			using (var connection = _dapperContext.CreateConnection())
+			{
+				TaskToDo? task = connection.QuerySingleOrDefault<TaskToDo>("SELECT Id, Title, Description, CreationDate, DueDate, IsCompleted FROM Tasks WHERE Id = @Id", new { Id = id });
+
+				if (task == null)
+					return null;
+
+				List<TaskCategory> tasksCategories = connection.Query<TaskCategory>("SELECT TaskId, CategoryId FROM TasksCategories WHERE TaskId = @Id", new { Id = id }).ToList();
+
+				task.Categories = new List<Category>();
+
+				foreach (var taskCategory in tasksCategories)
+				{
+					if (taskCategory.TaskId == task.Id)
+					{
+						task.Categories.Add(connection.QuerySingle<Category>("SELECT Id, Name FROM Categories WHERE Id = @Id", new { Id = taskCategory.CategoryId }));
+					}
+				}
+
+				return task;
 			}
 		}
 	}

@@ -7,11 +7,5 @@
         public List<TaskToDo> Tasks { get; set; }
 
         public Category() { }
-
-        public Category(int id, string name)
-        {
-            Id = id;
-            Name = name;
-		}
     }
 }

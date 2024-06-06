@@ -1,4 +1,11 @@
+using GraphQL;
+using GraphQL.Types;
 using ToDoApp.Data;
+using ToDoApp.GraphQl.Queries;
+using ToDoApp.GraphQl.Mutations;
+using ToDoApp.GraphQl.Schemas;
+using ToDoApp.GraphQl.Types;
+using ToDoApp.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IDapperContext, DapperContext>();
@@ -8,7 +15,21 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddSingleton<IRepository, DapperRepository>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddSingleton<TaskToDoType>();
+builder.Services.AddSingleton<CategoryType>();
+builder.Services.AddSingleton<TaskToDoInputType>();
+
+builder.Services.AddSingleton<TaskToDoQuery>();
+builder.Services.AddSingleton<TaskToDoMutation>();
+
+builder.Services.AddSingleton<ISchema, TaskToDoSchema>();
+builder.Services.AddGraphQL(x => x
+	.AddAutoSchema<ISchema>() 
+	.AddSystemTextJson()
+    );
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -24,14 +45,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSession();
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseGraphQLAltair();
+app.UseGraphQL<ISchema>();
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Tasks}/{action=Index}/{id?}");
