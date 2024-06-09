@@ -14,10 +14,10 @@ namespace ToDoApp.GraphQl.Mutations
 				.Arguments(new QueryArguments(new QueryArgument<TaskToDoInputType> { Name = "task" }, new QueryArgument<ListGraphType<IntGraphType>> { Name = "categoryIds" }))
 				.Resolve(context =>
 				{
-					var taskInput = context.GetArgument<TaskToDo>("task");
-					var categoryIds = context.GetArgument<int[]>("categoryIds");
-					repository.Add(taskInput, categoryIds);
-					return taskInput;
+					TaskToDo taskInput = context.GetArgument<TaskToDo>("task");
+					int[] categoryIds = context.GetArgument<int[]>("categoryIds");
+					int taskId = repository.Add(taskInput, categoryIds);
+					return repository.GetTask(taskId);
 				})
 				.Description("Create a new task");
 
@@ -36,7 +36,7 @@ namespace ToDoApp.GraphQl.Mutations
 				.Resolve(context =>
 				{
 					int taskId = context.GetArgument<int>("id");
-					var deletedTask = repository.GetTask(taskId);
+					TaskToDo deletedTask = repository.GetTask(taskId);
 					repository.Delete(taskId);
 					return deletedTask;
 				})

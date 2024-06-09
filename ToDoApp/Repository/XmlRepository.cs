@@ -14,7 +14,7 @@ namespace ToDoApp.Repository
 			_categoriesPath = categoriesPath;
 		}
 
-		public void Add(TaskToDo entity, int[] categoriesId)
+		public int Add(TaskToDo entity, int[] categoriesId)
 		{
 			entity.CreationDate = DateTime.Now;
 			XDocument tasksDoc = XDocument.Load(_tasksPath);
@@ -39,6 +39,8 @@ namespace ToDoApp.Repository
 
 			tasksDoc.Root.Add(taskElement);
 			tasksDoc.Save(_tasksPath);
+
+			return newTaskId;
 		}
 
 		public void Complete(int entityId)

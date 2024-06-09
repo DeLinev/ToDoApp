@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using System.Threading.Tasks;
 using ToDoApp.Data;
 using ToDoApp.Models;
 
@@ -13,24 +14,27 @@ namespace ToDoApp.Repository
 			_dapperContext = dapperContext;
 		}
 
-		public void Add(TaskToDo entity, int[] categoriesId)
+		public int Add(TaskToDo entity, int[] categoriesId)
 		{
 			entity.CreationDate = DateTime.Now;
+			int taskId;
 
 			using (var connection = _dapperContext.CreateConnection())
 			{
-				int taskId = connection.QuerySingle<int>("INSERT INTO Tasks (Title, Description, CreationDate, DueDate, IsCompleted) " +
+				taskId = connection.QuerySingle<int>("INSERT INTO Tasks (Title, Description, CreationDate, DueDate, IsCompleted) " +
 														 "OUTPUT INSERTED.Id " +
 														 "VALUES (@Title, @Description, @CreationDate, @DueDate, @IsCompleted)", entity);
 
 				if (categoriesId == null)
-					return;
+					return taskId;
 
 				foreach (var categoryId in categoriesId)
 				{
 					connection.Execute("INSERT INTO TasksCategories (TaskId, CategoryId) VALUES (@TaskId, @CategoryId)", new { TaskId = taskId, CategoryId = categoryId });
 				}
 			}
+
+			return taskId;
 		}
 
 		public void Delete(int entityId)
