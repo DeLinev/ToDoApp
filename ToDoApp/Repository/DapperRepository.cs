@@ -113,5 +113,40 @@ namespace ToDoApp.Repository
 				return task;
 			}
 		}
+
+		public async Task<IDictionary<int, List<Category>>> GetCategoriesAsync(IEnumerable<int> taskIds, CancellationToken cancellationToken)
+		{
+			using (var connection = _dapperContext.CreateConnection())
+			{
+				var query = "SELECT tc.TaskId, c.Id, c.Name " +
+					"FROM TasksCategories tc " +
+					"JOIN Categories c ON tc.CategoryId = c.Id " +
+					"WHERE tc.TaskId IN @TaskIds";
+
+				var taskCategories = new Dictionary<int, List<Category>>();
+				var results = connection.Query(
+					query,
+					new { TaskIds = taskIds.ToArray() }
+				);
+
+				foreach (var result in results)
+				{
+					Category category = new Category
+					{
+						Id = result.Id,
+						Name = result.Name
+					};
+
+					if (!taskCategories.ContainsKey(result.TaskId))
+					{
+						taskCategories[result.TaskId] = new List<Category>();
+					}
+
+					taskCategories[result.TaskId].Add(category);
+				}
+
+				return taskCategories;
+			}
+		}
 	}
 }

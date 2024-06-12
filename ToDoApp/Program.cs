@@ -6,6 +6,8 @@ using ToDoApp.GraphQl.Mutations;
 using ToDoApp.GraphQl.Schemas;
 using ToDoApp.GraphQl.Types;
 using ToDoApp.Repository;
+using ToDoApp.GraphQl;
+using GraphQL.DataLoader;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IDapperContext, DapperContext>();
@@ -25,10 +27,15 @@ builder.Services.AddSingleton<TaskToDoInputType>();
 builder.Services.AddSingleton<TaskToDoQuery>();
 builder.Services.AddSingleton<TaskToDoMutation>();
 
+builder.Services.AddSingleton<CategoryDataLoader>();
+builder.Services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
+builder.Services.AddSingleton<DataLoaderDocumentListener>();
+
 builder.Services.AddSingleton<ISchema, TaskToDoSchema>();
 builder.Services.AddGraphQL(x => x
 	.AddAutoSchema<ISchema>() 
 	.AddSystemTextJson()
+    .AddDataLoader()
     );
 
 // Add services to the container.

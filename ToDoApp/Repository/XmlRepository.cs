@@ -97,7 +97,7 @@ namespace ToDoApp.Repository
 				{
 					Category category = new Category();
 					category.Id = int.Parse(categoryElement.Attribute("id").Value);
-					
+
 					XDocument categoriesDoc = XDocument.Load(_categoriesPath);
 					XElement categoryNameElement = categoriesDoc.Root.Elements("category")
 						.FirstOrDefault(c => c.Attribute("id").Value == category.Id.ToString());
@@ -111,6 +111,42 @@ namespace ToDoApp.Repository
 			}
 
 			return tasks;
+		}
+
+		public async Task<IDictionary<int, List<Category>>> GetCategoriesAsync(IEnumerable<int> taskIds, CancellationToken cancellationToken)
+		{
+			var taskCategories = new Dictionary<int, List<Category>>();
+
+			XDocument doc = XDocument.Load(_tasksPath);
+			List<TaskToDo> tasks = new List<TaskToDo>();
+
+			foreach (XElement taskElement in doc.Root.Elements("task"))
+			{
+				int taskId = int.Parse(taskElement.Attribute("id").Value);
+
+				if (!taskIds.Contains(taskId))
+					continue;
+
+				if (!taskCategories.ContainsKey(taskId))
+				{
+					taskCategories[taskId] = new List<Category>();
+				}
+
+				foreach (XElement categoryElement in taskElement.Element("categories").Elements("category"))
+				{
+					Category category = new Category();
+					category.Id = int.Parse(categoryElement.Attribute("id").Value);
+
+					XDocument categoriesDoc = XDocument.Load(_categoriesPath);
+					XElement categoryNameElement = categoriesDoc.Root.Elements("category")
+						.FirstOrDefault(c => c.Attribute("id").Value == category.Id.ToString());
+					category.Name = categoryNameElement.Element("name").Value;
+
+					taskCategories[taskId].Add(category);
+				}
+			}
+
+			return taskCategories;
 		}
 
 		public TaskToDo GetTask(int id)
