@@ -8,6 +8,7 @@ using ToDoApp.GraphQl.Types;
 using ToDoApp.Repository;
 using ToDoApp.GraphQl;
 using GraphQL.DataLoader;
+using ToDoApp.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IDapperContext, DapperContext>();
@@ -17,7 +18,12 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
 builder.Services.AddSingleton<IRepository, DapperRepository>();
+builder.Services.AddSingleton<DapperRepository>();
+builder.Services.AddSingleton<XmlRepository>();
+builder.Services.AddSingleton<RepositoryFactory>();
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddSingleton<TaskToDoType>();
@@ -27,9 +33,7 @@ builder.Services.AddSingleton<TaskToDoInputType>();
 builder.Services.AddSingleton<TaskToDoQuery>();
 builder.Services.AddSingleton<TaskToDoMutation>();
 
-builder.Services.AddSingleton<CategoryDataLoader>();
 builder.Services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
-builder.Services.AddSingleton<DataLoaderDocumentListener>();
 
 builder.Services.AddSingleton<ISchema, TaskToDoSchema>();
 builder.Services.AddGraphQL(x => x
@@ -51,6 +55,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseMiddleware<StorageMiddleware>();
 app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();

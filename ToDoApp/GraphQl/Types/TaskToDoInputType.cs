@@ -11,7 +11,6 @@ namespace ToDoApp.GraphQl.Types
 			Field<NonNullGraphType<StringGraphType>>("description");
 			Field<DateTimeGraphType>("dueDate");
 			Field<NonNullGraphType<BooleanGraphType>>("isCompleted");
-			Field<ListGraphType<NonNullGraphType<IntGraphType>>>("categoryIds");
 		}
 	}
 }

@@ -8,12 +8,15 @@ namespace ToDoApp.GraphQl.Mutations
 {
 	public class TaskToDoMutation : ObjectGraphType
 	{
-		public TaskToDoMutation(IRepository repository)
+		public TaskToDoMutation(RepositoryFactory repositoryFactory, IHttpContextAccessor httpContextAccessor)
 		{
 			Field<TaskToDoType>("createTask")
-				.Arguments(new QueryArguments(new QueryArgument<TaskToDoInputType> { Name = "task" }, new QueryArgument<ListGraphType<IntGraphType>> { Name = "categoryIds" }))
+				.Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<TaskToDoInputType>> { Name = "task" }, 
+						   new QueryArgument<NonNullGraphType<ListGraphType<IntGraphType>>> { Name = "categoryIds" }))
 				.Resolve(context =>
 				{
+					var repository = repositoryFactory.CreateRepository(httpContextAccessor.HttpContext);
+
 					TaskToDo taskInput = context.GetArgument<TaskToDo>("task");
 					int[] categoryIds = context.GetArgument<int[]>("categoryIds");
 					int taskId = repository.Add(taskInput, categoryIds);
@@ -25,6 +28,8 @@ namespace ToDoApp.GraphQl.Mutations
 				.Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }))
 				.Resolve(context =>
 				{
+					var repository = repositoryFactory.CreateRepository(httpContextAccessor.HttpContext);
+
 					int taskId = context.GetArgument<int>("id");
 					repository.Complete(taskId);
 					return repository.GetTask(taskId);
@@ -35,6 +40,8 @@ namespace ToDoApp.GraphQl.Mutations
 				.Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }))
 				.Resolve(context =>
 				{
+					var repository = repositoryFactory.CreateRepository(httpContextAccessor.HttpContext);
+
 					int taskId = context.GetArgument<int>("id");
 					TaskToDo deletedTask = repository.GetTask(taskId);
 					repository.Delete(taskId);

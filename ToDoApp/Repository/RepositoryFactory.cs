@@ -3,29 +3,39 @@ using ToDoApp.Data;
 
 namespace ToDoApp.Repository
 {
-	public static class RepositoryFactory
+	public class RepositoryFactory
 	{
-		public static IDapperContext DapperContext { get; set; }
-		public static IConfiguration XmlConfiguration { get; set; }
+		private readonly IServiceProvider _serviceProvider;
 
-		public static IRepository CreateRepository(string type)
+		public RepositoryFactory(IServiceProvider serviceProvider)
+		{
+			_serviceProvider = serviceProvider;
+		}
+
+		public IRepository CreateRepository(HttpContext context)
+		{
+			string? storageType = context.Items["StorageType"]?.ToString();
+
+			switch(storageType)
+			{
+				case "xml":
+					return _serviceProvider.GetService<XmlRepository>();
+				case "db":
+					return _serviceProvider.GetService<DapperRepository>();
+				default:
+					return _serviceProvider.GetService<DapperRepository>();
+			}
+		}
+
+		public IRepository CreateRepository(string type)
 		{
 			if (type == "Dapper")
 			{
-				if (DapperContext == null)
-					throw new ArgumentNullException("DapperContext is not set");
-
-				return new DapperRepository(DapperContext);
+				return _serviceProvider.GetService<DapperRepository>();
 			}
 			else if (type == "XML")
 			{
-				if (XmlConfiguration == null)
-					throw new ArgumentNullException("Configuration is not set");
-
-				string tasksPath = XmlConfiguration.GetConnectionString("TasksPath");
-				string categoriesPath = XmlConfiguration.GetConnectionString("CategoriesPath");
-
-				return new XmlRepository(tasksPath, categoriesPath);
+				return _serviceProvider.GetService<XmlRepository>();
 			}
 			else
 			{

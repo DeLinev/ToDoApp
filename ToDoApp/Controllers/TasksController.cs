@@ -9,13 +9,13 @@ namespace ToDoApp.Controllers
 	{
 		private IRepository _repository;
 		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly RepositoryFactory _factory;
 
-		public TasksController(IDapperContext dapperContext, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+		public TasksController(IHttpContextAccessor httpContextAccessor, RepositoryFactory factory)
 		{
 			_httpContextAccessor = httpContextAccessor;
-			RepositoryFactory.DapperContext = dapperContext;
-			RepositoryFactory.XmlConfiguration = configuration;
-			_repository = RepositoryFactory.CreateRepository(_httpContextAccessor.HttpContext.Session.GetString("repositoryType") ?? "Dapper");
+			_factory = factory;
+			_repository = _factory.CreateRepository(_httpContextAccessor.HttpContext.Session.GetString("repositoryType") ?? "Dapper");
 		}
 
 		public ActionResult Index()
@@ -56,7 +56,7 @@ namespace ToDoApp.Controllers
 		public IActionResult ChangeRepository(string repositoryType)
 		{
 			HttpContext.Session.SetString("repositoryType", repositoryType);
-			_repository = RepositoryFactory.CreateRepository(repositoryType);
+			_repository = _factory.CreateRepository(repositoryType);
 			return RedirectToAction(nameof(Index));
 		}
 	}

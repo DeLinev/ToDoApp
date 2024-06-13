@@ -1,13 +1,13 @@
 ﻿using ToDoApp.Models;
 using GraphQL.Types;
-using ToDoApp.Repository;
 using GraphQL.DataLoader;
+using ToDoApp.Repository;
 
 namespace ToDoApp.GraphQl.Types
 {
 	public class TaskToDoType : ObjectGraphType<TaskToDo>
 	{
-		public TaskToDoType(IDataLoaderContextAccessor dataLoaderAccessor, IRepository repository)
+		public TaskToDoType(IDataLoaderContextAccessor accessor, RepositoryFactory repositoryFactory, IHttpContextAccessor httpContextAccessor)
 		{
 			Field(x => x.Id).Description("Task id");
 			Field(x => x.Title, nullable: true).Description("Task title");
@@ -18,11 +18,12 @@ namespace ToDoApp.GraphQl.Types
 			Field<ListGraphType<CategoryType>>("categories")
 				.Resolve(context =>
 				{
-					var loader = context.RequestServices.GetRequiredService<CategoryDataLoader>();
+					var repository = repositoryFactory.CreateRepository(httpContextAccessor.HttpContext);
+					var loader = accessor.Context.GetOrAddBatchLoader<int, List<Category>>(
+						"GetCategories", repository.GetCategoriesAsync);
 					return loader.LoadAsync(context.Source.Id);
 				})
 				.Description("Task categories");
-
 		}
 	}
 }

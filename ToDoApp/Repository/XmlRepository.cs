@@ -8,10 +8,10 @@ namespace ToDoApp.Repository
 		private readonly string _tasksPath;
 		private readonly string _categoriesPath;
 
-		public XmlRepository(string taskspath, string categoriesPath)
+		public XmlRepository(IConfiguration XmlConfiguration)
 		{
-			_tasksPath = taskspath;
-			_categoriesPath = categoriesPath;
+			_tasksPath = XmlConfiguration.GetConnectionString("TasksPath");
+			_categoriesPath = XmlConfiguration.GetConnectionString("CategoriesPath");
 		}
 
 		public int Add(TaskToDo entity, int[] categoriesId)
