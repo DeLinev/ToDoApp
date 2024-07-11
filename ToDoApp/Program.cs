@@ -19,6 +19,17 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddSingleton<IRepository, DapperRepository>();
 builder.Services.AddSingleton<DapperRepository>();
 builder.Services.AddSingleton<XmlRepository>();
@@ -61,6 +72,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors("AllowFrontend");
 app.UseGraphQLAltair();
 app.UseGraphQL<ISchema>();
 app.UseAuthorization();

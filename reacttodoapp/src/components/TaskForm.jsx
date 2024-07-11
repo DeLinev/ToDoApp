@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addTask } from '../redux/tasksSlice'
+import { createTask } from '../redux/actions'
 
 export default function TaskForm() {
     const [title, setTitle] = React.useState('')
@@ -34,7 +34,20 @@ export default function TaskForm() {
     function handleSubmit(e) {
         e.preventDefault()
         if (description) {
-            dispatch(addTask({ id: Date.now(), title, description, dueDate, isCompleted: false, categories: selectedCategories }))
+            const date = new Date(dueDate)
+            const houersDiff = date.getHours() - date.getTimezoneOffset() / 60
+            const minutesDiff = (date.getMinutes() - date.getTimezoneOffset()) % 60
+            date.setHours(houersDiff)
+            date.setMinutes(minutesDiff)
+            dispatch(createTask({
+                id: Date.now(),
+                title,
+                description,
+                dueDate: date.toJSON(),
+                creationDate: Date.now(),
+                isCompleted: false,
+                categoryIds: selectedCategories
+            }))
             setTitle('')
             setDescription('')
             setDueDate('')

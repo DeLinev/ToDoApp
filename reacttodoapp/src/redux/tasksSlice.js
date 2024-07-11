@@ -5,15 +5,18 @@ const tasksSlice = createSlice({
     initialState: [],
     reducers: {
         addTask: (state, action) => {
-            state.push(action.payload);
+            state.push(action.payload)
         },
         completeTask: (state, action) => {
             const task = state.find(task => task.id === action.payload);
             if (task)
-                task.completed = true;
+                task.isCompleted = true;
         },
         deleteTask: (state, action) => {
             return state.filter(task => task.id !== action.payload);
+        },
+        fetchTasksSuccess: (state, action) => {
+            return action.payload
         }
     }
 })
